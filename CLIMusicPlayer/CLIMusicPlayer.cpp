@@ -3,9 +3,22 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <conio.h>
 
 #include "Music.h"
 #include "File.h"
+
+void OutputScreen()
+{
+    for (size_t i = 0; i < Music::musics.size(); i++)
+    {
+        std::cout << Music::musics.at(i).fileIndex << ": ";
+        std::wcout << Music::musics.at(i).fileName << std::endl;
+    }
+
+    std::cout << "________________________________________" << std::endl;
+    std::cout << "0: Stop" << std::endl;
+}
 
 int main()
 {
@@ -13,6 +26,7 @@ int main()
     if (std::filesystem::is_directory("music") || !std::filesystem::exists("music"))
     {
         std::filesystem::create_directory("music");
+        Music::currentFiles = 0;
     }
 
    
@@ -34,11 +48,37 @@ int main()
 
     for (size_t i = 0; i < Music::musics.size(); i++)
     {
-        std::wcout << Music::musics.at(i).fileName << std::endl;
-        std::wcout << Music::musics.at(i).path << std::endl;
+        Music::currentFiles++;
+        Music::musics.at(i).fileIndex = Music::currentFiles;
     }
+    
+    OutputScreen();
 
+    int pick;
 
+    // Loop
+    while (1)
+    {
+        std::cin >> pick;
+
+        if (pick == 0)
+        {
+            PlaySound(NULL, 0, 0);
+        }
+        else
+        {
+            for (int i = 0; i < Music::musics.size(); i++)
+            {
+                if (pick == Music::musics.at(i).fileIndex)
+                {
+                    PlaySound(Music::musics.at(i).path.c_str(), NULL, SND_ASYNC);
+                }
+            }
+        }
+
+        system("cls");
+        OutputScreen();
+    }
 
     //bool played = PlaySound(path.c_str(), NULL, SND_ASYNC);
     //std::cout << played;
